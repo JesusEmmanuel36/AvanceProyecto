@@ -122,28 +122,7 @@ function eliminarTarea(taskId) {
     .catch(error => console.error('Error al eliminar tarea:', error));
 }
 
-// Función para obtener las tareas del usuario autenticado
-function cargarTareas() {
-  const token = localStorage.getItem('token');
-  fetch('/api/tasks', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token // Enviar el token en la cabecera
-    }
-  })
-    .then(response => response.json())
-    .then(tasks => {
-      const taskList = document.getElementById('tasks');
-      taskList.innerHTML = '';
-      tasks.forEach(task => {
-        const li = document.createElement('li');
-        li.textContent = task.name;
-        taskList.appendChild(li);
-      });
-    })
-    .catch(error => console.error('Error al obtener tareas:', error));
-}
+ 
 
 // Función para agregar tareas
 document.getElementById('add-task').addEventListener('click', () => {
