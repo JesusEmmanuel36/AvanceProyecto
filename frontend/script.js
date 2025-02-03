@@ -77,8 +77,6 @@ function verificarAutenticacion() {
     window.location.href = 'login.html';
   }
 }
-
-// Cargar tareas en home.html
  
 // Agregar tarea
  
@@ -116,6 +114,10 @@ function cargarTareas() {
       tasks.forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.addEventListener('click', () => eliminarTarea(task._id));
+        li.appendChild(deleteButton);
         taskList.appendChild(li);
       });
     })
