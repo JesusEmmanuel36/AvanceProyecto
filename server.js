@@ -1,68 +1,60 @@
 const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const path = require('path');
+
+// Importar middleware
+const errorHandler = require('./middlewares/errorHandler');
+
+// Importar rutas
+const userRoutes = require('./routes/user');
+const taskRoutes = require('./routes/task');
+
+// Conectar a la base de datos
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.DB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log('Conectado a MongoDB'))
+  .catch(err => console.error('Error al conectar a MongoDB:', err));
+
 const app = express();
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
 
-app.use(bodyParser.json());
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-let tasks = [];  // Lista de tareas (en memoria)
-let users = [];  // Lista de usuarios (en memoria)
+// Servir archivos estáticos (html, css, js)
+app.use(express.static(path.join(__dirname, 'frontend')));
 
-const SECRET_KEY = 'mi_clave_secreta';
-
-// Middleware para verificar el token
-function verifyToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token no proporcionado');
-  
-  jwt.verify(token, SECRET_KEY, (err, decoded) => {
-    if (err) return res.status(500).send('Token no válido');
-    req.user = decoded;  // Guardamos la información del usuario en el request
-    next();
-  });
-}
-
-// Ruta para registrar usuarios
-app.post('/api/users/signup', (req, res) => {
-  const { username, password } = req.body;
-  if (users.some(user => user.username === username)) {
-    return res.status(400).send('El usuario ya existe');
-  }
-  users.push({ username, password });
-  res.status(200).send('Usuario creado correctamente');
+// Ruta para la página principal (home)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'login.html')); // Redirigir siempre a la página de login
 });
 
-// Ruta para hacer login y generar el token
-app.post('/api/users/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(user => user.username === username && user.password === password);
-  if (!user) {
-    return res.status(400).send('Credenciales incorrectas');
-  }
-  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-  res.json({ token });
+// Ruta para la página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
 });
 
-// Ruta para obtener las tareas de un usuario
-app.get('/api/tasks', verifyToken, (req, res) => {
-  // Filtrar las tareas por el nombre de usuario
-  const userTasks = tasks.filter(task => task.user === req.user.username);
-  res.json(userTasks);
+// Ruta para la página de signup
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'signup.html'));
 });
 
-// Ruta para agregar tareas a un usuario
-app.post('/api/tasks', verifyToken, (req, res) => {
-  const { name } = req.body;
-  if (!name) {
-    return res.status(400).send('El nombre de la tarea es obligatorio');
-  }
+// Rutas de la API
+app.use('/api/users', userRoutes);
+app.use('/api/tasks', taskRoutes);
 
-  const newTask = { name, user: req.user.username };
-  tasks.push(newTask);
-  res.status(200).send('Tarea agregada');
+// Usar middleware de manejo de errores (debe ir al final)
+app.use(errorHandler);
+
+// Puerto del servidor
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Servidor corriendo en el puerto ${port}`);
 });
 
-// Iniciar el servidor
-app.listen(3000, () => {
-  console.log('Servidor corriendo en el puerto 3000');
-});
+
