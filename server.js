@@ -3,8 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
 
-// Importar middlewares
-const authenticate = require('./middlewares/authenticate');
+// Importar middleware
 const errorHandler = require('./middlewares/errorHandler');
 
 // Importar rutas
@@ -30,7 +29,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Ruta para la página principal (home)
-app.get('/', authenticate, (req, res) => { // Usar el middleware de autenticación
+app.get('/', (req, res) => { // Eliminar el middleware de autenticación
   res.sendFile(path.join(__dirname, 'frontend', 'home.html'));
 });
 
@@ -41,7 +40,7 @@ app.get('/login', (req, res) => {
 
 // Rutas de la API
 app.use('/api/users', userRoutes);
-app.use('/api/tasks', authenticate, taskRoutes); // Protege la ruta de tareas con autenticación
+app.use('/api/tasks', taskRoutes); // Eliminar el middleware de autenticación en la ruta de tareas
 
 // Usar middleware de manejo de errores (debe ir al final)
 app.use(errorHandler);
