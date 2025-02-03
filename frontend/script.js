@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Verificar si estamos en la página de inicio
   if (window.location.pathname.includes('home.html')) {
     verificarAutenticacion();
     cargarTareas();
   }
 
-  // Manejo del login
+  //login
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
     loginForm.addEventListener('submit', async function (e) {
@@ -33,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Manejo del registro
+  //registro
   const signupForm = document.getElementById('signup-form');
   if (signupForm) {
     signupForm.addEventListener('submit', async function (e) {
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Manejo del logout
+  //logout
   const logoutButton = document.getElementById('logout');
   if (logoutButton) {
     logoutButton.addEventListener('click', () => {
@@ -70,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Verificar autenticación antes de entrar a home.html
 function verificarAutenticacion() {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -78,10 +76,7 @@ function verificarAutenticacion() {
   }
 }
  
-// Agregar tarea
- 
-
-// Eliminar tarea
+//Eliminar tarea
 function eliminarTarea(taskId) {
   const token = localStorage.getItem('token');
   fetch(`/api/tasks/${taskId}`, {
@@ -97,14 +92,14 @@ function eliminarTarea(taskId) {
     .catch(error => console.error('Error al eliminar tarea:', error));
 }
 
-// Función para obtener las tareas del usuario autenticado
+//obtener las tareas del usuario autenticado
 function cargarTareas() {
   const token = localStorage.getItem('token');
   fetch('/api/tasks', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': token // Enviar el token en la cabecera
+      'Authorization': token 
     }
   })
     .then(response => response.json())
@@ -120,7 +115,7 @@ function cargarTareas() {
     .catch(error => console.error('Error al obtener tareas:', error));
 }
 
-// Función para agregar tareas
+//agregar tareas
 document.getElementById('add-task').addEventListener('click', () => {
   const taskName = prompt('Ingrese el nombre de la tarea:');
   if (taskName) {
@@ -135,7 +130,7 @@ document.getElementById('add-task').addEventListener('click', () => {
     })
       .then(response => response.json())
       .then(task => {
-        cargarTareas(); // Volver a cargar las tareas después de agregar una nueva
+        cargarTareas(); //Volver a cargar las tareas 
       })
       .catch(error => console.error('Error al agregar tarea:', error));
   }

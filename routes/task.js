@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
-// Middleware para verificar el token JWT
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
 
@@ -16,12 +15,11 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return res.status(403).json({ message: 'Token inválido' });
     }
-    req.userId = decoded.id; // Guardar el ID del usuario en la petición
+    req.userId = decoded.id; 
     next();
   });
 };
 
-// Ruta para obtener todas las tareas del usuario autenticado
 router.get('/', verifyToken, async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.userId });
@@ -31,13 +29,12 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-// Ruta para agregar una tarea para el usuario autenticado
 router.post('/', verifyToken, async (req, res) => {
   try {
     const { name } = req.body;
     const newTask = new Task({
       name,
-      user: req.userId // Asociamos la tarea con el usuario autenticado
+      user: req.userId
     });
     await newTask.save();
     res.status(201).json(newTask);
@@ -46,7 +43,6 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-// Ruta para eliminar una tarea
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
