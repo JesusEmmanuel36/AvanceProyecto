@@ -94,6 +94,7 @@ function eliminarTarea(taskId) {
 
 //obtener las tareas del usuario autenticado
 function cargarTareas() {
+  console.log("CARGAR TAREAS")
   const token = localStorage.getItem('token');
   fetch('/api/tasks', {
     method: 'GET',
@@ -109,6 +110,13 @@ function cargarTareas() {
       tasks.forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
+
+        // Crear botón de eliminar
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.addEventListener('click', () => eliminarTarea(task._id));
+
+        li.appendChild(deleteButton);
         taskList.appendChild(li);
       });
     })
