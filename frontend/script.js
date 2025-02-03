@@ -163,24 +163,3 @@ function cargarTareas() {
     })
     .catch(error => console.error('Error al obtener tareas:', error));
 }
-
-// Función para agregar tareas
-document.getElementById('add-task').addEventListener('click', () => {
-  const taskName = prompt('Ingrese el nombre de la tarea:');
-  if (taskName) {
-    const token = localStorage.getItem('token');
-    fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      },
-      body: JSON.stringify({ name: taskName })
-    })
-      .then(response => response.json())
-      .then(task => {
-        cargarTareas(); // Volver a cargar las tareas después de agregar una nueva
-      })
-      .catch(error => console.error('Error al agregar tarea:', error));
-  }
-});
