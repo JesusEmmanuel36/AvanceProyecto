@@ -6,7 +6,7 @@ document.getElementById('login-form').addEventListener('submit', async function 
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/users/login', {
+    const response = await fetch('https://avanceproyecto.onrender.com/api/users/login', { // URL de producción
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -28,59 +28,59 @@ document.getElementById('login-form').addEventListener('submit', async function 
 
 // Función para obtener las tareas (solo en home.html)
 window.onload = async () => {
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html'; // Redirigir a login si no hay token
-}
+  if (!localStorage.getItem('token')) {
+    window.location.href = 'login.html'; // Redirigir a login si no hay token
+  }
 
-const token = localStorage.getItem('token');
-const taskList = document.getElementById('tasks');
+  const token = localStorage.getItem('token');
+  const taskList = document.getElementById('tasks');
 
-// Obtener tareas desde el backend
-try {
-  const response = await fetch('http://localhost:3000/api/tasks', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+  // Obtener tareas desde el backend
+  try {
+    const response = await fetch('https://avanceproyecto.onrender.com/api/tasks', { // URL de producción
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
-  const tasks = await response.json();
-  tasks.forEach(task => {
-    const li = document.createElement('li');
-    li.textContent = task.name;
-    taskList.appendChild(li);
-  });
-} catch (error) {
-  console.error('Error al obtener tareas:', error);
-}
-
-// Función para agregar tarea
-document.getElementById('add-task').addEventListener('click', async () => {
-  const taskName = prompt('Ingrese el nombre de la tarea:');
-  if (taskName) {
-    try {
-      const response = await fetch('http://localhost:3000/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ name: taskName })
-      });
-
-      const task = await response.json();
+    const tasks = await response.json();
+    tasks.forEach(task => {
       const li = document.createElement('li');
       li.textContent = task.name;
       taskList.appendChild(li);
-    } catch (error) {
-      console.error('Error al agregar tarea:', error);
-    }
+    });
+  } catch (error) {
+    console.error('Error al obtener tareas:', error);
   }
-});
 
-// Función para cerrar sesión
-document.getElementById('logout').addEventListener('click', () => {
-  localStorage.removeItem('token');
-  window.location.href = 'login.html';  // Redirigir a login
-});
+  // Función para agregar tarea
+  document.getElementById('add-task').addEventListener('click', async () => {
+    const taskName = prompt('Ingrese el nombre de la tarea:');
+    if (taskName) {
+      try {
+        const response = await fetch('https://avanceproyecto.onrender.com/api/tasks', { // URL de producción
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name: taskName })
+        });
+
+        const task = await response.json();
+        const li = document.createElement('li');
+        li.textContent = task.name;
+        taskList.appendChild(li);
+      } catch (error) {
+        console.error('Error al agregar tarea:', error);
+      }
+    }
+  });
+
+  // Función para cerrar sesión
+  document.getElementById('logout').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';  // Redirigir a login
+  });
 };

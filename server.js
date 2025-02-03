@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
 // Importar middlewares
 const authenticate = require('./middlewares/authenticate');
@@ -24,7 +25,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Servir archivos estáticos (html, css, js)
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+// Ruta para la página principal (home)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'home.html'));
+});
+
+// Ruta para la página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+});
+
+// Rutas de la API
 app.use('/api/users', userRoutes);
 
 // Usar middleware de manejo de errores (debe ir al final)
