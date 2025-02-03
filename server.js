@@ -9,6 +9,7 @@ const errorHandler = require('./middlewares/errorHandler');
 
 // Importar rutas
 const userRoutes = require('./routes/user');
+const taskRoutes = require('./routes/task'); // Ruta de tareas
 
 // Conectar a la base de datos
 const mongoose = require('mongoose');
@@ -29,7 +30,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Ruta para la página principal (home)
-app.get('/', (req, res) => {
+app.get('/', authenticate, (req, res) => { // Usar el middleware de autenticación
   res.sendFile(path.join(__dirname, 'frontend', 'home.html'));
 });
 
@@ -40,6 +41,7 @@ app.get('/login', (req, res) => {
 
 // Rutas de la API
 app.use('/api/users', userRoutes);
+app.use('/api/tasks', authenticate, taskRoutes); // Protege la ruta de tareas con autenticación
 
 // Usar middleware de manejo de errores (debe ir al final)
 app.use(errorHandler);

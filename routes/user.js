@@ -1,12 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const authenticate = require('../middlewares/authenticate');
-const User = require('../models/User'); // Importar el modelo
-
+const User = require('../models/User');  
 const router = express.Router();
-
-// Ruta para registrar usuario
+ 
 router.post('/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -20,13 +17,13 @@ router.post('/signup', async (req, res) => {
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json({ message: 'Usuario creado exitosamente' });
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Error al crear usuario' });
   }
 });
-
-// Ruta para iniciar sesión
+ 
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
