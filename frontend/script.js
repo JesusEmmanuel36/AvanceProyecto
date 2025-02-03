@@ -1,106 +1,82 @@
- 
-document.getElementById('login-form').addEventListener('submit', async function (e) {
+// Función para manejar el inicio de sesión (sin token)
+document.getElementById('login-form').addEventListener('submit', function (e) {
   e.preventDefault();
 
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
 
-  try {
-    const response = await fetch('https://avanceproyecto.onrender.com/api/users/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      window.location.href = 'home.html';  // Redirigir a la página principal
-    } else {
-      document.getElementById('error-message').textContent = data.message || 'Error al iniciar sesión';
-    }
-  } catch (error) {
-    document.getElementById('error-message').textContent = 'Hubo un error al conectar con el servidor';
+  // Aquí simularíamos una validación sin autenticación real
+  if (username === 'usuario' && password === 'contraseña') { // Validación ficticia
+    window.location.href = 'home.html';  // Redirigir a la página principal
+  } else {
+    document.getElementById('error-message').textContent = 'Usuario o contraseña incorrectos';
   }
 });
- 
-document.getElementById('signup-form').addEventListener('submit', async function (e) {
+
+// Función para manejar el registro de un nuevo usuario (sin token)
+document.getElementById('signup-form').addEventListener('submit', function (e) {
   e.preventDefault();
 
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
 
-  try {
-    const response = await fetch('https://avanceproyecto.onrender.com/api/users/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
+  // Guardar el nuevo usuario en la base de datos sin autenticación real
+  fetch('https://avanceproyecto.onrender.com/api/users/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.token) {
       window.location.href = 'home.html';  // Redirigir a la página principal
     } else {
       document.getElementById('error-message').textContent = data.message || 'Error al crear cuenta';
     }
-  } catch (error) {
+  })
+  .catch(() => {
     document.getElementById('error-message').textContent = 'Hubo un error al conectar con el servidor';
-  }
+  });
 });
 
 // Función para obtener las tareas (solo en home.html)
-window.onload = async () => {
-  if (!localStorage.getItem('token')) {
-    window.location.href = 'login.html'; // Redirigir a login si no hay token
-  }
-
-  const token = localStorage.getItem('token');
+window.onload = () => {
   const taskList = document.getElementById('tasks');
-
-  try {
-    const response = await fetch('https://avanceproyecto.onrender.com/api/tasks', {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const tasks = await response.json();
-    tasks.forEach(task => {
-      const li = document.createElement('li');
-      li.textContent = task.name;
-      taskList.appendChild(li);
-    });
-  } catch (error) {
-    console.error('Error al obtener tareas:', error);
-  }
-
-  document.getElementById('add-task').addEventListener('click', async () => {
-    const taskName = prompt('Ingrese el nombre de la tarea:');
-    if (taskName) {
-      try {
-        const response = await fetch('https://avanceproyecto.onrender.com/api/tasks', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ name: taskName })
-        });
-
-        const task = await response.json();
+  
+  fetch('https://avanceproyecto.onrender.com/api/tasks')
+    .then(response => response.json())
+    .then(tasks => {
+      tasks.forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
         taskList.appendChild(li);
-      } catch (error) {
+      });
+    })
+    .catch(error => {
+      console.error('Error al obtener tareas:', error);
+    });
+
+  document.getElementById('add-task').addEventListener('click', () => {
+    const taskName = prompt('Ingrese el nombre de la tarea:');
+    if (taskName) {
+      fetch('https://avanceproyecto.onrender.com/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: taskName })
+      })
+      .then(response => response.json())
+      .then(task => {
+        const li = document.createElement('li');
+        li.textContent = task.name;
+        taskList.appendChild(li);
+      })
+      .catch(error => {
         console.error('Error al agregar tarea:', error);
-      }
+      });
     }
   });
 
   document.getElementById('logout').addEventListener('click', () => {
-    localStorage.removeItem('token');
     window.location.href = 'login.html';  // Redirigir a login
   });
 };

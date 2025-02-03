@@ -1,9 +1,4 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');  
-const router = express.Router();
- 
+// Ruta para registrar usuario
 router.post('/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -17,13 +12,13 @@ router.post('/signup', async (req, res) => {
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(201).json({ token });
+    res.status(201).json({ message: 'Usuario creado exitosamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al crear usuario' });
   }
 });
- 
+
+// Ruta para iniciar sesión
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -34,11 +29,8 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Contraseña incorrecta' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ message: 'Inicio de sesión exitoso' });
   } catch (error) {
     res.status(500).json({ message: 'Error en la autenticación' });
   }
 });
-
-module.exports = router;
