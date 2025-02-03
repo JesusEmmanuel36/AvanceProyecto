@@ -80,7 +80,12 @@ function verificarAutenticacion() {
 
 // Cargar tareas en home.html
 function cargarTareas() {
-  fetch('/api/tasks')
+  const token = localStorage.getItem('token');
+  fetch('/api/tasks', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
     .then(response => response.json())
     .then(tasks => {
       const taskList = document.getElementById('tasks');
@@ -88,9 +93,50 @@ function cargarTareas() {
       tasks.forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.addEventListener('click', () => eliminarTarea(task._id));
+        li.appendChild(deleteButton);
         taskList.appendChild(li);
       });
     })
     .catch(error => console.error('Error al obtener tareas:', error));
 }
 
+// Agregar tarea
+document.getElementById('add-task').addEventListener('click', () => {
+  const token = localStorage.getItem('token');
+  const taskName = prompt('Ingresa el nombre de la tarea:');
+  
+  if (taskName) {
+    fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name: taskName })
+    })
+      .then(response => response.json())
+      .then(data => {
+        cargarTareas();  // Recargar las tareas
+      })
+      .catch(error => console.error('Error al agregar tarea:', error));
+  }
+});
+
+// Eliminar tarea
+function eliminarTarea(taskId) {
+  const token = localStorage.getItem('token');
+  fetch(`/api/tasks/${taskId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      cargarTareas();  // Recargar las tareas
+    })
+    .catch(error => console.error('Error al eliminar tarea:', error));
+}

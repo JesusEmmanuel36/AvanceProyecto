@@ -24,4 +24,18 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Ruta para eliminar tarea
+router.delete('/:id', async (req, res) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    res.json({ message: 'Tarea eliminada exitosamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar tarea' });
+  }
+});
+
+
 module.exports = router;
