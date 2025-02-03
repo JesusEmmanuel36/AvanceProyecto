@@ -81,12 +81,6 @@ function verificarAutenticacion() {
 // Cargar tareas en home.html
 function cargarTareas() {
   const token = localStorage.getItem('token');
-  if (!token) {
-    alert('No estás autenticado. Redirigiendo a login...');
-    window.location.href = 'login.html';
-    return;
-  }
-
   fetch('/api/tasks', {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -111,15 +105,10 @@ function cargarTareas() {
 
 // Agregar tarea
 document.getElementById('add-task').addEventListener('click', () => {
+  const token = localStorage.getItem('token');
   const taskName = prompt('Ingresa el nombre de la tarea:');
+  
   if (taskName) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('No estás autenticado. Redirigiendo a login...');
-      window.location.href = 'login.html';
-      return;
-    }
-
     fetch('/api/tasks', {
       method: 'POST',
       headers: {
@@ -139,12 +128,6 @@ document.getElementById('add-task').addEventListener('click', () => {
 // Eliminar tarea
 function eliminarTarea(taskId) {
   const token = localStorage.getItem('token');
-  if (!token) {
-    alert('No estás autenticado. Redirigiendo a login...');
-    window.location.href = 'login.html';
-    return;
-  }
-
   fetch(`/api/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
@@ -157,3 +140,47 @@ function eliminarTarea(taskId) {
     })
     .catch(error => console.error('Error al eliminar tarea:', error));
 }
+
+// Función para obtener las tareas del usuario autenticado
+function cargarTareas() {
+  const token = localStorage.getItem('token');
+  fetch('/api/tasks', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token // Enviar el token en la cabecera
+    }
+  })
+    .then(response => response.json())
+    .then(tasks => {
+      const taskList = document.getElementById('tasks');
+      taskList.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.textContent = task.name;
+        taskList.appendChild(li);
+      });
+    })
+    .catch(error => console.error('Error al obtener tareas:', error));
+}
+
+// Función para agregar tareas
+document.getElementById('add-task').addEventListener('click', () => {
+  const taskName = prompt('Ingrese el nombre de la tarea:');
+  if (taskName) {
+    const token = localStorage.getItem('token');
+    fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify({ name: taskName })
+    })
+      .then(response => response.json())
+      .then(task => {
+        cargarTareas(); // Volver a cargar las tareas después de agregar una nueva
+      })
+      .catch(error => console.error('Error al agregar tarea:', error));
+  }
+});
