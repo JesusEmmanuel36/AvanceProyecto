@@ -82,7 +82,7 @@ function eliminarTarea(taskId) {
   fetch(`/api/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': token
     }
   })
     .then(response => response.json())
