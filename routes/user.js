@@ -1,3 +1,6 @@
+const express = require('express');
+const router = express.Router();
+
 // Ruta para registrar usuario
 router.post('/signup', async (req, res) => {
   try {
