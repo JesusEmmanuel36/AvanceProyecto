@@ -84,6 +84,8 @@ function verificarAutenticacion() {
 // Eliminar tarea
 function eliminarTarea(taskId) {
   const token = localStorage.getItem('token');
+  console.log('Token:', token); // Para verificar si el token está presente
+
   fetch(`/api/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
