@@ -84,8 +84,6 @@ function verificarAutenticacion() {
 // Eliminar tarea
 function eliminarTarea(taskId) {
   const token = localStorage.getItem('token');
-  console.log('Token:', token); // Para verificar si el token está presente
-
   fetch(`/api/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
@@ -116,10 +114,6 @@ function cargarTareas() {
       tasks.forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Eliminar';
-        deleteButton.addEventListener('click', () => eliminarTarea(task._id));
-        li.appendChild(deleteButton);
         taskList.appendChild(li);
       });
     })
