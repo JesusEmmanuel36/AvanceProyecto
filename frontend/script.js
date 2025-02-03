@@ -68,6 +68,55 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'login.html';
     });
   }
+
+  // Mostrar formulario para agregar tarea
+  const addTaskButton = document.getElementById('add-task');
+  const addTaskForm = document.getElementById('add-task-form');
+  const taskNameInput = document.getElementById('task-name');
+  const saveTaskButton = document.getElementById('save-task');
+  const cancelTaskButton = document.getElementById('cancel-task');
+
+  addTaskButton.addEventListener('click', () => {
+    addTaskForm.style.display = 'block';
+  });
+
+  cancelTaskButton.addEventListener('click', () => {
+    addTaskForm.style.display = 'none';
+    taskNameInput.value = '';
+  });
+
+  // Guardar tarea
+  saveTaskButton.addEventListener('click', async () => {
+    const taskName = taskNameInput.value.trim();
+    if (taskName === '') {
+      alert('El nombre de la tarea no puede estar vacío.');
+      return;
+    }
+
+    const task = { name: taskName };
+
+    try {
+      const response = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(task)
+      });
+
+      if (response.ok) {
+        cargarTareas();  // Recargar la lista de tareas
+        addTaskForm.style.display = 'none';  // Ocultar el formulario
+        taskNameInput.value = '';  // Limpiar el campo
+      } else {
+        const data = await response.json();
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error al agregar tarea:', error);
+    }
+  });
 });
 
 // Verificar autenticación antes de entrar a home.html
@@ -80,7 +129,9 @@ function verificarAutenticacion() {
 
 // Cargar tareas en home.html
 function cargarTareas() {
-  fetch('/api/tasks')
+  fetch('/api/tasks', {
+    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  })
     .then(response => response.json())
     .then(tasks => {
       const taskList = document.getElementById('tasks');
